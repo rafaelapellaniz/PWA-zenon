@@ -30,6 +30,65 @@ const FAMILY = [
   { id: 'pet',     name: 'Pet',     emoji: '🐕', sound: 'Pet',     color: '#8D6E63' }
 ];
 
+// ──────────────── ABC DATA ────────────────
+
+const ABC_LETTERS = [
+  'a','b','c','d','e','f','g','h','i','j','k','l','m',
+  'n','ñ','o','p','q','r','s','t','u','v','w','x','y','z'
+];
+
+const ABC_WORDS = [
+  { id: 'arbol',      name: 'Árbol',      letter: 'a', color: '#43A047' },
+  { id: 'abeja',      name: 'Abeja',      letter: 'a', color: '#FFA000' },
+  { id: 'barco',      name: 'Barco',      letter: 'b', color: '#1E88E5' },
+  { id: 'ballena',    name: 'Ballena',    letter: 'b', color: '#546E7A' },
+  { id: 'casa',       name: 'Casa',       letter: 'c', color: '#FF7043' },
+  { id: 'caballo',    name: 'Caballo',    letter: 'c', color: '#8D6E63' },
+  { id: 'dinosaurio', name: 'Dinosaurio', letter: 'd', color: '#66BB6A' },
+  { id: 'delfin',     name: 'Delfín',     letter: 'd', color: '#29B6F6' },
+  { id: 'estrella',   name: 'Estrella',   letter: 'e', color: '#FFD93D' },
+  { id: 'elefante',   name: 'Elefante',   letter: 'e', color: '#78909C' },
+  { id: 'flor',       name: 'Flor',       letter: 'f', color: '#EC407A' },
+  { id: 'fresa',      name: 'Fresa',      letter: 'f', color: '#E53935' },
+  { id: 'gato',       name: 'Gato',       letter: 'g', color: '#FF9800' },
+  { id: 'globo',      name: 'Globo',      letter: 'g', color: '#AB47BC' },
+  { id: 'helado',     name: 'Helado',     letter: 'h', color: '#F48FB1' },
+  { id: 'hormiga',    name: 'Hormiga',    letter: 'h', color: '#6D4C41' },
+  { id: 'iglesia',    name: 'Iglesia',    letter: 'i', color: '#9E9E9E' },
+  { id: 'iguana',     name: 'Iguana',     letter: 'i', color: '#43A047' },
+  { id: 'jirafa',     name: 'Jirafa',     letter: 'j', color: '#FFA000' },
+  { id: 'jardin',     name: 'Jardín',     letter: 'j', color: '#66BB6A' },
+  { id: 'koala',      name: 'Koala',      letter: 'k', color: '#78909C' },
+  { id: 'kiwi',       name: 'Kiwi',       letter: 'k', color: '#8D6E63' },
+  { id: 'leon',       name: 'León',       letter: 'l', color: '#FFA000' },
+  { id: 'luna',       name: 'Luna',       letter: 'l', color: '#1976D2' },
+  { id: 'mariposa',   name: 'Mariposa',   letter: 'm', color: '#AB47BC' },
+  { id: 'manzana',    name: 'Manzana',    letter: 'm', color: '#E53935' },
+  { id: 'naranja',    name: 'Naranja',    letter: 'n', color: '#FF9800' },
+  { id: 'nube',       name: 'Nube',       letter: 'n', color: '#90CAF9' },
+  { id: 'nandu',      name: 'Ñandú',      letter: 'ñ', color: '#8D6E63' },
+  { id: 'oso',        name: 'Oso',        letter: 'o', color: '#6D4C41' },
+  { id: 'oveja',      name: 'Oveja',      letter: 'o', color: '#9E9E9E' },
+  { id: 'perro',      name: 'Perro',      letter: 'p', color: '#8D6E63' },
+  { id: 'pelota',     name: 'Pelota',     letter: 'p', color: '#E53935' },
+  { id: 'queso',      name: 'Queso',      letter: 'q', color: '#FFC107' },
+  { id: 'raton',      name: 'Ratón',      letter: 'r', color: '#78909C' },
+  { id: 'rosa',       name: 'Rosa',       letter: 'r', color: '#EC407A' },
+  { id: 'sol',        name: 'Sol',        letter: 's', color: '#FFD93D' },
+  { id: 'serpiente',  name: 'Serpiente',   letter: 's', color: '#43A047' },
+  { id: 'tortuga',    name: 'Tortuga',    letter: 't', color: '#66BB6A' },
+  { id: 'tren',       name: 'Tren',       letter: 't', color: '#1E88E5' },
+  { id: 'uva',        name: 'Uva',        letter: 'u', color: '#7B1FA2' },
+  { id: 'unicornio',  name: 'Unicornio',  letter: 'u', color: '#AB47BC' },
+  { id: 'vaca',       name: 'Vaca',       letter: 'v', color: '#9E9E9E' },
+  { id: 'volcan',     name: 'Volcán',     letter: 'v', color: '#FF7043' },
+  { id: 'waffle',     name: 'Waffle',     letter: 'w', color: '#FFA000' },
+  { id: 'xilofono',   name: 'Xilófono',   letter: 'x', color: '#EC407A' },
+  { id: 'yoyo',       name: 'Yoyo',       letter: 'y', color: '#1E88E5' },
+  { id: 'zapato',     name: 'Zapato',     letter: 'z', color: '#6D4C41' },
+  { id: 'zanahoria',  name: 'Zanahoria',  letter: 'z', color: '#FF7043' }
+];
+
 const COLOR_PALETTE = [
   '#FF9800','#E91E63','#1976D2','#43A047','#AB47BC',
   '#FF7043','#66BB6A','#FFA000','#78909C','#8D6E63',
@@ -41,7 +100,7 @@ const COLOR_PALETTE = [
 const mediaDB = {
   _db: null,
   DB_NAME: 'zenon-media',
-  DB_VERSION: 1,
+  DB_VERSION: 2,
 
   open() {
     if (this._db) return Promise.resolve(this._db);
@@ -52,6 +111,7 @@ const mediaDB = {
         if (!db.objectStoreNames.contains('images')) db.createObjectStore('images');
         if (!db.objectStoreNames.contains('sounds')) db.createObjectStore('sounds');
         if (!db.objectStoreNames.contains('custom-items')) db.createObjectStore('custom-items');
+        if (!db.objectStoreNames.contains('abc-words')) db.createObjectStore('abc-words');
       };
       req.onsuccess = (e) => { this._db = e.target.result; resolve(this._db); };
       req.onerror = () => reject(req.error);
@@ -113,6 +173,16 @@ const mediaDB = {
   },
   deleteCustomItem(mod, id) {
     return this._delete('custom-items', this.key(mod, id));
+  },
+
+  saveAbcWord(word) {
+    return this._put('abc-words', `${word.letter}/${word.id}`, word);
+  },
+  getAbcWords() {
+    return this._getAll('abc-words');
+  },
+  deleteAbcWord(letter, id) {
+    return this._delete('abc-words', `${letter}/${id}`);
   }
 };
 
@@ -217,7 +287,10 @@ const state = {
   addingItem: false,
   // Media cache for current render
   imageURLs: {},
-  customItems: []
+  customItems: [],
+  // ABC module
+  abcLetterIndex: 0,
+  abcCustomWords: []
 };
 
 // ──────────────── SOUND MANAGER ────────────────
@@ -301,6 +374,8 @@ const sound = {
     const soundBlob = await media.getSoundBlob(moduleType, item.id);
     if (soundBlob) {
       await this.playBlob(soundBlob);
+    } else if (moduleType === 'abc') {
+      await this.speak(item.name, { lang: 'es-ES', rate: 0.85 });
     } else if (moduleType === 'animals') {
       await this.speak(item.sound, { pitch: 1.1, rate: 1 });
       await delay(300);
@@ -314,6 +389,8 @@ const sound = {
     const soundBlob = await media.getSoundBlob(moduleType, item.id);
     if (soundBlob) {
       this.playBlob(soundBlob);
+    } else if (moduleType === 'abc') {
+      this.speak(item.name, { lang: 'es-ES', rate: 0.85 });
     } else if (moduleType === 'animals') {
       this.speak(item.sound, { pitch: 1.1, rate: 1 });
     } else {
@@ -336,12 +413,25 @@ function shuffle(arr) {
 }
 
 function getItems() {
+  if (state.module === 'abc') return getAbcWords();
   const base = state.module === 'animals' ? ANIMALS : FAMILY;
   const custom = state.customItems.filter(i => i.module === state.module);
   return [...base, ...custom];
 }
 
+function getAbcWords(letter) {
+  const custom = state.abcCustomWords || [];
+  const all = [...ABC_WORDS, ...custom];
+  if (letter) return all.filter(w => w.letter === letter);
+  return all;
+}
+
+function getAbcLetterLabel(letter) {
+  return letter === 'ñ' ? 'Ñ' : letter.toUpperCase();
+}
+
 function getModuleLabel() {
+  if (state.module === 'abc') return '🔤 ABC';
   return state.module === 'animals' ? '🐾 Animals' : '👨‍👩‍👧‍👦 Family';
 }
 
@@ -354,10 +444,17 @@ function gridCols(count) {
 }
 
 function sanitizeId(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/ñ/g, 'n')
+    .replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
 
 function itemExists(mod, id) {
+  if (mod === 'abc') {
+    if (ABC_WORDS.some(w => w.id === id)) return true;
+    return (state.abcCustomWords || []).some(w => w.id === id);
+  }
   const builtIn = mod === 'animals' ? ANIMALS : FAMILY;
   if (builtIn.some(i => i.id === id)) return true;
   return state.customItems.some(i => i.module === mod && i.id === id);
@@ -376,6 +473,12 @@ async function preloadImages() {
       const url = await media.getImageURL(mod, item.id);
       if (url) state.imageURLs[`${mod}/${item.id}`] = url;
     }
+  }
+  // ABC words
+  const abcAll = [...ABC_WORDS, ...(state.abcCustomWords || [])];
+  for (const word of abcAll) {
+    const url = await media.getImageURL('abc', word.id);
+    if (url) state.imageURLs[`abc/${word.id}`] = url;
   }
 }
 
@@ -402,6 +505,9 @@ function render() {
     case 'explore':  app.innerHTML = renderExplore();  break;
     case 'quiz':     app.innerHTML = renderQuiz();     break;
     case 'results':  app.innerHTML = renderResults();  break;
+    case 'abcExplore':    app.innerHTML = renderAbcExplore();    break;
+    case 'abcQuiz':       app.innerHTML = renderAbcQuiz();       break;
+    case 'abcLetterWords':app.innerHTML = renderAbcLetterWords();break;
     case 'settings': app.innerHTML = renderSettings(); break;
     case 'editItem': app.innerHTML = renderItemEditor(); break;
     case 'addItem':  app.innerHTML = renderAddItem();  break;
@@ -432,12 +538,23 @@ function renderHome() {
           <div class="menu-card-emoji">🦁</div>
           <div class="menu-card-label">Animals</div>
         </div>
+        <div class="menu-card" data-go="menu" data-module="abc">
+          <div class="menu-card-emoji">🔤</div>
+          <div class="menu-card-label">ABC</div>
+        </div>
       </div>
       <button class="settings-btn" data-go="settings">⚙️ Manage</button>
     </div>`;
 }
 
 function renderMenu() {
+  const isAbc = state.module === 'abc';
+  const exploreTarget = isAbc ? 'abcExplore' : 'explore';
+  const quizTarget = isAbc ? 'abcQuiz' : 'quiz';
+  const quizAction = isAbc ? 'startAbcQuiz' : 'startQuiz';
+  const exploreDesc = isAbc ? 'Letras y palabras' : 'Tap to hear sounds';
+  const quizDesc = isAbc ? 'Escuchar y adivinar' : 'Listen &amp; guess!';
+
   return `
     <div class="header">
       <button class="back-btn" data-go="home">◀</button>
@@ -446,15 +563,15 @@ function renderMenu() {
     </div>
     <div class="content">
       <div class="card-row">
-        <div class="menu-card" data-go="explore">
+        <div class="menu-card" data-go="${exploreTarget}">
           <div class="menu-card-emoji">👆</div>
           <div class="menu-card-label">Explore</div>
-          <div class="menu-card-desc">Tap to hear sounds</div>
+          <div class="menu-card-desc">${exploreDesc}</div>
         </div>
-        <div class="menu-card" data-go="quiz" data-action="startQuiz">
+        <div class="menu-card" data-go="${quizTarget}" data-action="${quizAction}">
           <div class="menu-card-emoji">🎯</div>
           <div class="menu-card-label">Quiz</div>
-          <div class="menu-card-desc">Listen &amp; guess!</div>
+          <div class="menu-card-desc">${quizDesc}</div>
         </div>
       </div>
     </div>`;
@@ -535,10 +652,172 @@ function renderResults() {
     </div>`;
 }
 
+// ──────────────── ABC EXPLORE (CAROUSEL) ────────────────
+
+function renderAbcExplore() {
+  const idx = state.abcLetterIndex;
+  const letter = ABC_LETTERS[idx];
+  const words = getAbcWords(letter);
+  const total = ABC_LETTERS.length;
+
+  const wordCards = words.map(w => {
+    const key = `abc/${w.id}`;
+    const imgURL = state.imageURLs[key];
+    return `
+      <div class="abc-word-card" data-word-id="${w.id}"
+           style="background:linear-gradient(135deg,${w.color}dd,${w.color}99)">
+        ${imgURL
+          ? `<img class="abc-word-img" src="${imgURL}" alt="${w.name}" draggable="false">`
+          : `<div class="abc-word-placeholder">?</div>`}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="header">
+      <button class="back-btn" data-go="menu">◀</button>
+      <div class="header-title">🔤 ABC – Explore</div>
+      <div class="header-right">${idx + 1} / ${total}</div>
+    </div>
+    <div class="content">
+      <div class="abc-carousel">
+        <button class="abc-arrow abc-arrow-left" id="abcPrev" ${idx === 0 ? 'disabled' : ''}>◀</button>
+        <div class="abc-letter-display">${getAbcLetterLabel(letter)}</div>
+        <button class="abc-arrow abc-arrow-right" id="abcNext" ${idx === total - 1 ? 'disabled' : ''}>▶</button>
+      </div>
+      <div class="abc-words-grid">${wordCards}</div>
+    </div>`;
+}
+
+// ──────────────── ABC QUIZ ────────────────
+
+function renderAbcQuiz() {
+  const num = `${state.quizIndex + 1} / ${state.quizItems.length}`;
+  const opts = state.quizOptions.map(letter => `
+    <div class="abc-quiz-option" data-letter="${letter}">
+      ${getAbcLetterLabel(letter)}
+    </div>`).join('');
+
+  return `
+    <div class="header">
+      <button class="back-btn" data-go="menu">◀</button>
+      <div class="header-title">🔤 ABC – Quiz</div>
+      <div class="header-right">⭐ ${num}</div>
+    </div>
+    <div class="content">
+      <div class="quiz-wrap">
+        <div class="quiz-prompt">¿Con qué letra empieza?</div>
+        <button class="play-btn" id="playBtn">🔊</button>
+        <div class="abc-quiz-options">${opts}</div>
+      </div>
+    </div>`;
+}
+
+function startAbcQuiz() {
+  const allWords = getAbcWords();
+  state.quizItems = shuffle(allWords).slice(0, Math.min(10, allWords.length));
+  state.quizIndex = 0;
+  state.quizScore = 0;
+  state.quizLocked = false;
+  prepareAbcQuestion();
+}
+
+function prepareAbcQuestion() {
+  const word = state.quizItems[state.quizIndex];
+  const correctLetter = word.letter;
+  const otherLetters = ABC_LETTERS.filter(l => l !== correctLetter);
+  const wrongLetters = shuffle(otherLetters).slice(0, 3);
+  state.quizOptions = shuffle([correctLetter, ...wrongLetters]);
+  state.quizCorrect = word;
+  state.quizLocked = false;
+}
+
+function handleAbcQuizAnswer(letter) {
+  if (state.quizLocked) return;
+  state.quizLocked = true;
+
+  const correct = state.quizCorrect;
+  const isRight = letter === correct.letter;
+
+  if (isRight) state.quizScore++;
+
+  document.querySelectorAll('.abc-quiz-option').forEach(el => {
+    el.classList.add('disabled');
+    if (el.dataset.letter === letter) {
+      el.classList.add(isRight ? 'correct' : 'wrong');
+    }
+    if (el.dataset.letter === correct.letter && !isRight) {
+      el.classList.add('reveal');
+    }
+  });
+
+  if (isRight) {
+    sound.correct();
+    spawnConfetti();
+  } else {
+    sound.wrong();
+  }
+
+  setTimeout(() => {
+    state.quizIndex++;
+    if (state.quizIndex < state.quizItems.length) {
+      prepareAbcQuestion();
+      go('abcQuiz');
+      setTimeout(() => sound.playQuizClue(state.quizCorrect, 'abc'), 400);
+    } else {
+      go('results');
+      if (state.quizScore / state.quizItems.length >= 0.7) spawnConfetti();
+    }
+  }, isRight ? 1200 : 1800);
+}
+
+// ──────────────── ABC SETTINGS LETTER WORDS ────────────────
+
+function renderAbcLetterWords() {
+  const letter = state.abcSettingsLetter;
+  const builtIn = ABC_WORDS.filter(w => w.letter === letter);
+  const custom = (state.abcCustomWords || []).filter(w => w.letter === letter);
+  const all = [...builtIn, ...custom];
+
+  const items = all.map(w => {
+    const key = `abc/${w.id}`;
+    const hasImg = !!state.imageURLs[key];
+    const isCustom = custom.some(c => c.id === w.id);
+    return `
+      <div class="settings-item" data-abc-word-id="${w.id}" data-abc-word-letter="${w.letter}">
+        <div class="settings-item-visual" style="background:linear-gradient(135deg,${w.color}dd,${w.color}99)">
+          ${hasImg
+            ? `<img class="settings-item-img" src="${state.imageURLs[key]}" alt="${w.name}" draggable="false">`
+            : `<span class="settings-item-emoji">?</span>`}
+        </div>
+        <div class="settings-item-info">
+          <div class="settings-item-name">${w.name}${isCustom ? ' <span class="custom-badge">custom</span>' : ''}</div>
+          <div class="settings-item-status">
+            ${hasImg ? '🖼️' : '⬜'} Image
+          </div>
+        </div>
+        <div class="settings-item-arrow">▶</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="header">
+      <button class="back-btn" data-go="settings">◀</button>
+      <div class="header-title">Letra ${getAbcLetterLabel(letter)}</div>
+      <div class="header-right"></div>
+    </div>
+    <div class="settings-list">
+      ${items}
+      <button class="add-item-btn" id="addAbcWord">+ Add Word</button>
+    </div>`;
+}
+
 // ──────────────── SETTINGS SCREEN ────────────────
 
 function renderSettings() {
   const tab = state.settingsTab;
+
+  if (tab === 'abc') return renderSettingsAbc();
+
   const base = tab === 'animals' ? ANIMALS : FAMILY;
   const custom = state.customItems.filter(i => i.module === tab);
   const all = [...base, ...custom];
@@ -571,13 +850,49 @@ function renderSettings() {
       <div class="header-title">⚙️ Manage Media</div>
       <div class="header-right"></div>
     </div>
-    <div class="settings-tabs">
-      <button class="settings-tab ${tab === 'animals' ? 'active' : ''}" data-tab="animals">🐾 Animals</button>
-      <button class="settings-tab ${tab === 'family' ? 'active' : ''}" data-tab="family">👨‍👩‍👧‍👦 Family</button>
-    </div>
+    ${renderSettingsTabs()}
     <div class="settings-list">
       ${items}
       <button class="add-item-btn" data-go="addItem" data-add-module="${tab}">+ Add New ${tab === 'animals' ? 'Animal' : 'Family Member'}</button>
+    </div>`;
+}
+
+function renderSettingsTabs() {
+  const tab = state.settingsTab;
+  return `
+    <div class="settings-tabs">
+      <button class="settings-tab ${tab === 'animals' ? 'active' : ''}" data-tab="animals">🐾 Animals</button>
+      <button class="settings-tab ${tab === 'family' ? 'active' : ''}" data-tab="family">👨‍👩‍👧‍👦 Family</button>
+      <button class="settings-tab ${tab === 'abc' ? 'active' : ''}" data-tab="abc">🔤 ABC</button>
+    </div>`;
+}
+
+function renderSettingsAbc() {
+  const letters = ABC_LETTERS.map(letter => {
+    const words = getAbcWords(letter);
+    const count = words.length;
+    return `
+      <div class="settings-item" data-abc-letter="${letter}">
+        <div class="settings-item-visual abc-letter-visual">
+          <span class="abc-letter-big">${getAbcLetterLabel(letter)}</span>
+        </div>
+        <div class="settings-item-info">
+          <div class="settings-item-name">Letra ${getAbcLetterLabel(letter)}</div>
+          <div class="settings-item-status">${count} palabra${count !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="settings-item-arrow">▶</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="header">
+      <button class="back-btn" data-go="home">◀</button>
+      <div class="header-title">⚙️ Manage Media</div>
+      <div class="header-right"></div>
+    </div>
+    ${renderSettingsTabs()}
+    <div class="settings-list">
+      ${letters}
     </div>`;
 }
 
@@ -589,11 +904,14 @@ function renderItemEditor() {
   const mod = item._module;
   const key = `${mod}/${item.id}`;
   const hasImg = !!state.imageURLs[key];
-  const isCustom = state.customItems.some(c => c.module === mod && c.id === item.id);
+  const isCustom = mod === 'abc'
+    ? (state.abcCustomWords || []).some(w => w.id === item.id)
+    : state.customItems.some(c => c.module === mod && c.id === item.id);
+  const backTarget = mod === 'abc' ? 'abcLetterWords' : 'settings';
 
   return `
     <div class="header">
-      <button class="back-btn" data-go="settings">◀</button>
+      <button class="back-btn" data-go="${backTarget}">◀</button>
       <div class="header-title">Edit: ${item.name}</div>
       <div class="header-right"></div>
     </div>
@@ -642,27 +960,35 @@ function renderItemEditor() {
 
 function renderAddItem() {
   const mod = state.settingsTab;
+  const isAbc = mod === 'abc';
   const colorBtns = COLOR_PALETTE.map(c =>
     `<button class="color-btn" data-color="${c}" style="background:${c}"></button>`
   ).join('');
 
+  const backTarget = isAbc ? 'abcLetterWords' : 'settings';
+  const title = isAbc
+    ? `Add Word (${getAbcLetterLabel(state._abcAddLetter || 'a')})`
+    : `Add New ${mod === 'animals' ? 'Animal' : 'Family Member'}`;
+  const namePlaceholder = isAbc ? 'e.g. Avión' : 'e.g. Tiger';
+
   return `
     <div class="header">
-      <button class="back-btn" data-go="settings">◀</button>
-      <div class="header-title">Add New ${mod === 'animals' ? 'Animal' : 'Family Member'}</div>
+      <button class="back-btn" data-go="${backTarget}">◀</button>
+      <div class="header-title">${title}</div>
       <div class="header-right"></div>
     </div>
     <div class="content">
       <div class="add-form">
         <div class="form-group">
           <label class="form-label">Name</label>
-          <input type="text" id="newItemName" class="form-input" placeholder="e.g. Tiger" autocomplete="off" maxlength="20">
+          <input type="text" id="newItemName" class="form-input" placeholder="${namePlaceholder}" autocomplete="off" maxlength="20">
         </div>
 
+        ${!isAbc ? `
         <div class="form-group">
           <label class="form-label">Sound Text (for speech fallback)</label>
           <input type="text" id="newItemSound" class="form-input" placeholder="e.g. Rawr!" autocomplete="off" maxlength="30">
-        </div>
+        </div>` : ''}
 
         <div class="form-group">
           <label class="form-label">Color</label>
@@ -679,6 +1005,7 @@ function renderAddItem() {
           <div id="newItemImagePreview" class="form-preview"></div>
         </div>
 
+        ${!isAbc ? `
         <div class="form-group">
           <label class="form-label">Sound (optional)</label>
           <label class="upload-btn">
@@ -686,7 +1013,7 @@ function renderAddItem() {
             <input type="file" accept="audio/*" capture="microphone" id="newItemSoundFile" hidden>
           </label>
           <div id="newItemSoundPreview" class="form-preview"></div>
-        </div>
+        </div>` : ''}
 
         <button class="big-btn save-btn" id="saveNewItem">Save</button>
       </div>
@@ -788,12 +1115,16 @@ function bind() {
 
       if (mod) state.module = mod;
       if (action === 'startQuiz') startQuiz();
+      if (action === 'startAbcQuiz') startAbcQuiz();
       if (addMod) state.settingsTab = addMod;
 
       go(target);
 
       if (target === 'quiz') {
         setTimeout(() => sound.playQuizClue(state.quizCorrect, state.module), 500);
+      }
+      if (target === 'abcQuiz') {
+        setTimeout(() => sound.playQuizClue(state.quizCorrect, 'abc'), 500);
       }
 
       requestFullscreen();
@@ -825,7 +1156,11 @@ function bind() {
   const playBtn = document.getElementById('playBtn');
   if (playBtn) {
     playBtn.addEventListener('click', () => {
-      sound.playQuizClue(state.quizCorrect, state.module);
+      if (state.screen === 'abcQuiz') {
+        sound.playQuizClue(state.quizCorrect, 'abc');
+      } else {
+        sound.playQuizClue(state.quizCorrect, state.module);
+      }
     });
   }
 
@@ -837,8 +1172,8 @@ function bind() {
     });
   });
 
-  // Settings item edit buttons
-  document.querySelectorAll('.settings-item').forEach(el => {
+  // Settings item edit buttons (animals/family)
+  document.querySelectorAll('.settings-item[data-edit-id]').forEach(el => {
     el.addEventListener('click', () => {
       const id = el.dataset.editId;
       const mod = el.dataset.editMod;
@@ -853,8 +1188,81 @@ function bind() {
     });
   });
 
+  // Settings ABC letter click — navigate to letter words
+  document.querySelectorAll('.settings-item[data-abc-letter]').forEach(el => {
+    el.addEventListener('click', () => {
+      state.abcSettingsLetter = el.dataset.abcLetter;
+      go('abcLetterWords');
+    });
+  });
+
+  // ABC Explore — carousel arrows
+  const abcPrev = document.getElementById('abcPrev');
+  const abcNext = document.getElementById('abcNext');
+  if (abcPrev) {
+    abcPrev.addEventListener('click', () => {
+      if (state.abcLetterIndex > 0) {
+        state.abcLetterIndex--;
+        go('abcExplore');
+      }
+    });
+  }
+  if (abcNext) {
+    abcNext.addEventListener('click', () => {
+      if (state.abcLetterIndex < ABC_LETTERS.length - 1) {
+        state.abcLetterIndex++;
+        go('abcExplore');
+      }
+    });
+  }
+
+  // ABC Explore — word card tap (speak word)
+  document.querySelectorAll('.abc-word-card').forEach(el => {
+    el.addEventListener('click', () => {
+      const wordId = el.dataset.wordId;
+      const allWords = getAbcWords();
+      const word = allWords.find(w => w.id === wordId);
+      if (!word) return;
+
+      el.classList.remove('playing');
+      void el.offsetWidth;
+      el.classList.add('playing');
+
+      sound.playItem(word, 'abc');
+    });
+  });
+
+  // ABC Quiz — letter option tap
+  document.querySelectorAll('.abc-quiz-option').forEach(el => {
+    el.addEventListener('click', () => handleAbcQuizAnswer(el.dataset.letter));
+  });
+
+  // ABC Letter Words settings — word item click (edit word image)
+  document.querySelectorAll('.settings-item[data-abc-word-id]').forEach(el => {
+    el.addEventListener('click', () => {
+      const wordId = el.dataset.abcWordId;
+      const letter = el.dataset.abcWordLetter;
+      const allWords = getAbcWords(letter);
+      const word = allWords.find(w => w.id === wordId);
+      if (word) {
+        state.editingItem = { ...word, _module: 'abc', emoji: '?' };
+        go('editItem');
+      }
+    });
+  });
+
+  // ABC Add word button
+  const addAbcWordBtn = document.getElementById('addAbcWord');
+  if (addAbcWordBtn) {
+    addAbcWordBtn.addEventListener('click', () => {
+      state.settingsTab = 'abc';
+      state._abcAddLetter = state.abcSettingsLetter;
+      go('addItem');
+    });
+  }
+
   // Async: check sound status indicators
-  if (state.screen === 'settings') {
+  if (state.screen === 'settings' && state.settingsTab !== 'abc') {
     checkSoundStatuses();
   }
 
@@ -934,13 +1342,22 @@ function bindEditor() {
 
   if (deleteItemBtn) {
     deleteItemBtn.addEventListener('click', async () => {
-      await mediaDB.deleteCustomItem(mod, item.id);
-      await mediaDB.deleteImage(mod, item.id);
-      await mediaDB.deleteSound(mod, item.id);
-      state.customItems = state.customItems.filter(i => !(i.module === mod && i.id === item.id));
-      delete state.imageURLs[`${mod}/${item.id}`];
-      state.editingItem = null;
-      go('settings');
+      if (mod === 'abc') {
+        await mediaDB.deleteAbcWord(item.letter, item.id);
+        await mediaDB.deleteImage('abc', item.id);
+        state.abcCustomWords = (state.abcCustomWords || []).filter(w => w.id !== item.id);
+        delete state.imageURLs[`abc/${item.id}`];
+        state.editingItem = null;
+        go('abcLetterWords');
+      } else {
+        await mediaDB.deleteCustomItem(mod, item.id);
+        await mediaDB.deleteImage(mod, item.id);
+        await mediaDB.deleteSound(mod, item.id);
+        state.customItems = state.customItems.filter(i => !(i.module === mod && i.id === item.id));
+        delete state.imageURLs[`${mod}/${item.id}`];
+        state.editingItem = null;
+        go('settings');
+      }
     });
   }
 }
@@ -992,9 +1409,7 @@ function bindAddItem() {
   // Save
   saveBtn.addEventListener('click', async () => {
     const nameEl = document.getElementById('newItemName');
-    const soundTextEl = document.getElementById('newItemSound');
     const name = (nameEl.value || '').trim();
-    const soundText = (soundTextEl.value || '').trim() || name;
 
     if (!name) {
       nameEl.classList.add('error');
@@ -1007,6 +1422,28 @@ function bindAddItem() {
       nameEl.classList.add('error');
       return;
     }
+
+    if (mod === 'abc') {
+      // ABC word add
+      const letter = state._abcAddLetter;
+      if (itemExists('abc', id)) {
+        nameEl.classList.add('error');
+        nameEl.placeholder = 'Word already exists!';
+        nameEl.value = '';
+        return;
+      }
+      const newWord = { id, name, letter, color: selectedColor };
+      await mediaDB.saveAbcWord(newWord);
+      if (!state.abcCustomWords) state.abcCustomWords = [];
+      state.abcCustomWords.push(newWord);
+      if (imageFile) await mediaDB.saveImage('abc', id, imageFile);
+      await preloadImages();
+      go('abcLetterWords');
+      return;
+    }
+
+    const soundTextEl = document.getElementById('newItemSound');
+    const soundText = (soundTextEl ? soundTextEl.value : '').trim() || name;
 
     if (itemExists(mod, id)) {
       nameEl.classList.add('error');
@@ -1092,6 +1529,7 @@ async function init() {
 
   await mediaDB.open();
   state.customItems = await mediaDB.getCustomItems();
+  state.abcCustomWords = await mediaDB.getAbcWords();
   await preloadImages();
 
   render();
