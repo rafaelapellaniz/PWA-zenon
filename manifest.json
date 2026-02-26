@@ -1,0 +1,19 @@
+{
+  "name": "Zenon's Learning World",
+  "short_name": "Zenon Learn",
+  "description": "Educational game for kids - learn animals and family members",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "categories": ["education", "games"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
