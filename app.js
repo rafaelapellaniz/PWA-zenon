@@ -1091,7 +1091,7 @@ function renderItemEditor() {
           <div class="editor-btns">
             <label class="upload-btn">
               📷 Upload Image
-              <input type="file" accept="image/*" capture="environment" id="imageInput" hidden>
+              <input type="file" accept="image/*"  id="imageInput" hidden>
             </label>
             ${hasImg ? '<button class="delete-btn" id="deleteImage">🗑️ Remove</button>' : ''}
           </div>
@@ -1173,7 +1173,7 @@ function renderAddItem() {
           <label class="form-label">Image (optional)</label>
           <label class="upload-btn">
             📷 Choose Image
-            <input type="file" accept="image/*" capture="environment" id="newItemImage" hidden>
+            <input type="file" accept="image/*"  id="newItemImage" hidden>
           </label>
           <div id="newItemImagePreview" class="form-preview"></div>
         </div>
