@@ -299,6 +299,40 @@ const sound = {
   synth: window.speechSynthesis,
   _ctx: null,
   _currentAudio: null,
+  _unlocked: false,
+  _silentAudio: null,
+
+  // iOS audio unlock – must run inside a user gesture (touchend / click)
+  unlock() {
+    if (this._unlocked) return;
+    this._unlocked = true;
+
+    // 1. Create & resume AudioContext
+    const ctx = this.ctx();
+
+    // 2. Play a tiny silent buffer through Web Audio to unlock it
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start(0);
+
+    // 3. Unlock HTML5 Audio element for iOS
+    if (!this._silentAudio) {
+      this._silentAudio = new Audio();
+      this._silentAudio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYlmKSnAAAAAAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYlmKSnAAAAAAAAAAAAAAAAAAAA';
+      this._silentAudio.load();
+    }
+    this._silentAudio.play().catch(() => {});
+
+    // 4. Kick speechSynthesis on iOS
+    if (this.synth) {
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      u.lang = 'en-US';
+      this.synth.speak(u);
+    }
+  },
 
   ctx() {
     if (!this._ctx) {
@@ -320,7 +354,9 @@ const sound = {
       u.onend   = resolve;
       u.onerror = resolve;
       this.synth.speak(u);
-      setTimeout(resolve, 3000);
+      // iOS workaround: speechSynthesis can pause when the page is in background;
+      // also add a longer safety timeout
+      setTimeout(resolve, 4000);
     });
   },
 
@@ -364,6 +400,8 @@ const sound = {
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       this._currentAudio = audio;
+      // iOS needs playsinline attribute
+      audio.setAttribute('playsinline', '');
       audio.onended = () => { URL.revokeObjectURL(url); this._currentAudio = null; resolve(); };
       audio.onerror = () => { URL.revokeObjectURL(url); this._currentAudio = null; resolve(); };
       audio.play().catch(() => resolve());
@@ -371,6 +409,7 @@ const sound = {
   },
 
   async playItem(item, moduleType) {
+    this.unlock();
     const soundBlob = await media.getSoundBlob(moduleType, item.id);
     if (soundBlob) {
       await this.playBlob(soundBlob);
@@ -386,6 +425,7 @@ const sound = {
   },
 
   async playQuizClue(item, moduleType) {
+    this.unlock();
     const soundBlob = await media.getSoundBlob(moduleType, item.id);
     if (soundBlob) {
       this.playBlob(soundBlob);
@@ -1527,12 +1567,30 @@ async function init() {
   lockViewport();
   requestWakeLock();
 
+  // Unlock audio on first user interaction (required by iOS)
+  const unlockAudio = () => {
+    sound.unlock();
+    document.removeEventListener('touchstart', unlockAudio, true);
+    document.removeEventListener('touchend', unlockAudio, true);
+    document.removeEventListener('click', unlockAudio, true);
+  };
+  document.addEventListener('touchstart', unlockAudio, true);
+  document.addEventListener('touchend', unlockAudio, true);
+  document.addEventListener('click', unlockAudio, true);
+
   await mediaDB.open();
   state.customItems = await mediaDB.getCustomItems();
   state.abcCustomWords = await mediaDB.getAbcWords();
   await preloadImages();
 
   render();
+
+  // Hide splash screen
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 600);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
