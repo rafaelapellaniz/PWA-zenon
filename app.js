@@ -208,18 +208,16 @@ const media = {
       return url;
     }
 
-    // 2. File folder – try common extensions
+    // 2. File folder – check all extensions in parallel
     const exts = ['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'];
-    for (const ext of exts) {
+    const results = await Promise.all(exts.map(ext => {
       const path = `assets/images/${mod}/${id}.${ext}`;
-      try {
-        const resp = await fetch(path, { method: 'HEAD' });
-        if (resp.ok) {
-          this._urlCache[cacheKey] = path;
-          return path;
-        }
-      } catch (e) { /* ignore */ }
-    }
+      return fetch(path, { method: 'HEAD' })
+        .then(r => r.ok ? path : null)
+        .catch(() => null);
+    }));
+    const found = results.find(Boolean);
+    if (found) { this._urlCache[cacheKey] = found; return found; }
 
     // 3. No image found
     return null;
@@ -230,43 +228,37 @@ const media = {
     const blob = await mediaDB.getSound(mod, id);
     if (blob) return blob;
 
-    // 2. File folder
+    // 2. File folder – check all extensions in parallel
     const exts = ['mp3', 'wav', 'ogg', 'webm', 'm4a'];
-    for (const ext of exts) {
+    const results = await Promise.all(exts.map(ext => {
       const path = `assets/sounds/${mod}/${id}.${ext}`;
-      try {
-        const resp = await fetch(path);
-        if (resp.ok) return await resp.blob();
-      } catch (e) { /* ignore */ }
-    }
-
-    return null;
+      return fetch(path)
+        .then(r => r.ok ? r.blob() : null)
+        .catch(() => null);
+    }));
+    return results.find(Boolean) || null;
   },
 
   async hasImage(mod, id) {
     const blob = await mediaDB.getImage(mod, id);
     if (blob) return true;
     const exts = ['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'];
-    for (const ext of exts) {
-      try {
-        const resp = await fetch(`assets/images/${mod}/${id}.${ext}`, { method: 'HEAD' });
-        if (resp.ok) return true;
-      } catch (e) { /* ignore */ }
-    }
-    return false;
+    const results = await Promise.all(exts.map(ext =>
+      fetch(`assets/images/${mod}/${id}.${ext}`, { method: 'HEAD' })
+        .then(r => r.ok).catch(() => false)
+    ));
+    return results.some(Boolean);
   },
 
   async hasSound(mod, id) {
     const blob = await mediaDB.getSound(mod, id);
     if (blob) return true;
     const exts = ['mp3', 'wav', 'ogg', 'webm', 'm4a'];
-    for (const ext of exts) {
-      try {
-        const resp = await fetch(`assets/sounds/${mod}/${id}.${ext}`, { method: 'HEAD' });
-        if (resp.ok) return true;
-      } catch (e) { /* ignore */ }
-    }
-    return false;
+    const results = await Promise.all(exts.map(ext =>
+      fetch(`assets/sounds/${mod}/${id}.${ext}`, { method: 'HEAD' })
+        .then(r => r.ok).catch(() => false)
+    ));
+    return results.some(Boolean);
   }
 };
 
@@ -325,12 +317,20 @@ const sound = {
     }
     this._silentAudio.play().catch(() => {});
 
-    // 4. Kick speechSynthesis on iOS
+    // 4. Kick speechSynthesis on iOS – use space (not empty string)
     if (this.synth) {
-      const u = new SpeechSynthesisUtterance('');
-      u.volume = 0;
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0.01;
       u.lang = 'en-US';
       this.synth.speak(u);
+    }
+
+    // 5. Preload voices (iOS loads them asynchronously)
+    if (this.synth && this.synth.getVoices) {
+      this.synth.getVoices();
+      if (typeof this.synth.addEventListener === 'function') {
+        this.synth.addEventListener('voiceschanged', () => this.synth.getVoices());
+      }
     }
   },
 
@@ -346,17 +346,36 @@ const sound = {
     return new Promise(resolve => {
       if (!this.synth) { resolve(); return; }
       this.synth.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.pitch  = opts.pitch  ?? 1;
-      u.rate   = opts.rate   ?? 0.9;
-      u.volume = opts.volume ?? 1;
-      u.lang   = opts.lang   ?? 'en-US';
-      u.onend   = resolve;
-      u.onerror = resolve;
-      this.synth.speak(u);
-      // iOS workaround: speechSynthesis can pause when the page is in background;
-      // also add a longer safety timeout
-      setTimeout(resolve, 4000);
+      let resolved = false;
+      const done = () => { if (!resolved) { resolved = true; resolve(); } };
+
+      // iOS needs a brief delay after cancel() before speak()
+      setTimeout(() => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.pitch  = opts.pitch  ?? 1;
+        u.rate   = opts.rate   ?? 0.9;
+        u.volume = opts.volume ?? 1;
+        u.lang   = opts.lang   ?? 'en-US';
+
+        // Select a matching voice if available
+        const voices = this.synth.getVoices();
+        const match = voices.find(v => v.lang === u.lang) ||
+                      voices.find(v => v.lang.startsWith(u.lang.split('-')[0]));
+        if (match) u.voice = match;
+
+        u.onend   = done;
+        u.onerror = done;
+        this.synth.speak(u);
+
+        // iOS workaround: periodically resume to prevent iOS from pausing speech
+        const keepAlive = setInterval(() => {
+          if (!this.synth.speaking) { clearInterval(keepAlive); return; }
+          this.synth.resume();
+        }, 2500);
+
+        // Safety timeout
+        setTimeout(() => { clearInterval(keepAlive); done(); }, 5000);
+      }, 60);
     });
   },
 
@@ -394,17 +413,43 @@ const sound = {
     if (this.synth) this.synth.cancel();
   },
 
+  _playViaWebAudio(blob) {
+    return new Promise((resolve) => {
+      blob.arrayBuffer().then(buf => {
+        const ctx = this.ctx();
+        ctx.decodeAudioData(buf, (decoded) => {
+          const source = ctx.createBufferSource();
+          source.buffer = decoded;
+          source.connect(ctx.destination);
+          source.onended = resolve;
+          source.start(0);
+        }, resolve);
+      }).catch(resolve);
+    });
+  },
+
   playBlob(blob) {
     return new Promise((resolve) => {
       this.stopAudio();
+      let resolved = false;
+      const done = () => { if (!resolved) { resolved = true; resolve(); } };
+
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       this._currentAudio = audio;
-      // iOS needs playsinline attribute
       audio.setAttribute('playsinline', '');
-      audio.onended = () => { URL.revokeObjectURL(url); this._currentAudio = null; resolve(); };
-      audio.onerror = () => { URL.revokeObjectURL(url); this._currentAudio = null; resolve(); };
-      audio.play().catch(() => resolve());
+
+      audio.onended = () => { URL.revokeObjectURL(url); this._currentAudio = null; done(); };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url); this._currentAudio = null;
+        // Fallback: play via Web Audio API
+        this._playViaWebAudio(blob).then(done);
+      };
+      audio.play().catch(() => {
+        URL.revokeObjectURL(url); this._currentAudio = null;
+        // Fallback: play via Web Audio API
+        this._playViaWebAudio(blob).then(done);
+      });
     });
   },
 
@@ -436,6 +481,80 @@ const sound = {
     } else {
       this.speak(item.sound, { rate: 0.85 });
     }
+  }
+};
+
+// ──────────────── AUDIO RECORDER ────────────────
+
+const recorder = {
+  _mediaRecorder: null,
+  _chunks: [],
+  _stream: null,
+  _startTime: 0,
+  _timerInterval: null,
+
+  isSupported() {
+    return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  },
+
+  async start() {
+    this._chunks = [];
+    this._stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                   : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
+    this._mediaRecorder = new MediaRecorder(this._stream, mimeType ? { mimeType } : {});
+    this._mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) this._chunks.push(e.data);
+    };
+    this._mediaRecorder.start();
+    this._startTime = Date.now();
+  },
+
+  stop() {
+    return new Promise((resolve) => {
+      if (!this._mediaRecorder || this._mediaRecorder.state === 'inactive') {
+        this._cleanup();
+        resolve(null);
+        return;
+      }
+      this._mediaRecorder.onstop = () => {
+        const blob = new Blob(this._chunks, {
+          type: this._mediaRecorder.mimeType || 'audio/webm'
+        });
+        this._cleanup();
+        resolve(blob);
+      };
+      this._mediaRecorder.stop();
+    });
+  },
+
+  cancel() {
+    if (this._mediaRecorder && this._mediaRecorder.state !== 'inactive') {
+      this._mediaRecorder.onstop = null;
+      this._mediaRecorder.stop();
+    }
+    this._cleanup();
+  },
+
+  _cleanup() {
+    if (this._stream) {
+      this._stream.getTracks().forEach(t => t.stop());
+      this._stream = null;
+    }
+    this._mediaRecorder = null;
+    this._chunks = [];
+    clearInterval(this._timerInterval);
+    this._timerInterval = null;
+  },
+
+  getElapsed() {
+    return Math.floor((Date.now() - this._startTime) / 1000);
+  },
+
+  formatTime(secs) {
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${m}:${s}`;
   }
 };
 
@@ -503,23 +622,26 @@ function itemExists(mod, id) {
 // ──────────────── PRELOAD MEDIA ────────────────
 
 async function preloadImages() {
-  const mods = ['animals', 'family'];
   state.imageURLs = {};
-  for (const mod of mods) {
+  const tasks = [];
+
+  for (const mod of ['animals', 'family']) {
     const base = mod === 'animals' ? ANIMALS : FAMILY;
     const custom = state.customItems.filter(i => i.module === mod);
-    const all = [...base, ...custom];
-    for (const item of all) {
-      const url = await media.getImageURL(mod, item.id);
-      if (url) state.imageURLs[`${mod}/${item.id}`] = url;
+    for (const item of [...base, ...custom]) {
+      tasks.push(media.getImageURL(mod, item.id).then(url => {
+        if (url) state.imageURLs[`${mod}/${item.id}`] = url;
+      }));
     }
   }
-  // ABC words
-  const abcAll = [...ABC_WORDS, ...(state.abcCustomWords || [])];
-  for (const word of abcAll) {
-    const url = await media.getImageURL('abc', word.id);
-    if (url) state.imageURLs[`abc/${word.id}`] = url;
+
+  for (const word of [...ABC_WORDS, ...(state.abcCustomWords || [])]) {
+    tasks.push(media.getImageURL('abc', word.id).then(url => {
+      if (url) state.imageURLs[`abc/${word.id}`] = url;
+    }));
   }
+
+  await Promise.all(tasks);
 }
 
 // ──────────────── NAVIGATION ────────────────
@@ -977,13 +1099,24 @@ function renderItemEditor() {
 
         <div class="editor-section">
           <div class="editor-section-title">🔊 Sound</div>
-          <div class="editor-btns">
+          <div class="editor-btns" id="soundBtns">
+            <button class="upload-btn" id="recordSound">🎤 Record</button>
             <label class="upload-btn">
-              🎤 Upload Sound
-              <input type="file" accept="audio/*" capture="microphone" id="soundInput" hidden>
+              📁 Upload File
+              <input type="file" accept="audio/*" id="soundInput" hidden>
             </label>
             <button class="upload-btn" id="previewSound">▶ Preview</button>
             <button class="delete-btn" id="deleteSound" style="display:none">🗑️ Remove</button>
+          </div>
+          <div id="recordingUI" class="recording-ui" style="display:none">
+            <div class="recording-indicator">
+              <span class="rec-dot"></span>
+              <span id="recTimer">00:00</span>
+            </div>
+            <div class="recording-btns">
+              <button class="upload-btn rec-stop" id="recStop">⏹ Stop</button>
+              <button class="delete-btn" id="recCancel">✕ Cancel</button>
+            </div>
           </div>
         </div>
 
@@ -1048,10 +1181,23 @@ function renderAddItem() {
         ${!isAbc ? `
         <div class="form-group">
           <label class="form-label">Sound (optional)</label>
-          <label class="upload-btn">
-            🎤 Choose Sound
-            <input type="file" accept="audio/*" capture="microphone" id="newItemSoundFile" hidden>
-          </label>
+          <div class="editor-btns">
+            <button class="upload-btn" type="button" id="newItemRecord">🎤 Record</button>
+            <label class="upload-btn">
+              📁 Upload File
+              <input type="file" accept="audio/*" id="newItemSoundFile" hidden>
+            </label>
+          </div>
+          <div id="newItemRecordingUI" class="recording-ui" style="display:none">
+            <div class="recording-indicator">
+              <span class="rec-dot"></span>
+              <span id="newItemRecTimer">00:00</span>
+            </div>
+            <div class="recording-btns">
+              <button class="upload-btn rec-stop" type="button" id="newItemRecStop">⏹ Stop</button>
+              <button class="delete-btn" type="button" id="newItemRecCancel">✕ Cancel</button>
+            </div>
+          </div>
           <div id="newItemSoundPreview" class="form-preview"></div>
         </div>` : ''}
 
@@ -1318,11 +1464,11 @@ async function checkSoundStatuses() {
   const base = tab === 'animals' ? ANIMALS : FAMILY;
   const custom = state.customItems.filter(i => i.module === tab);
   const all = [...base, ...custom];
-  for (const it of all) {
+  await Promise.all(all.map(async (it) => {
     const has = await media.hasSound(tab, it.id);
     const el = document.getElementById(`sound-status-${it.id}`);
     if (el) el.textContent = has ? '🔊' : '⬜';
-  }
+  }));
 }
 
 function bindEditor() {
@@ -1332,6 +1478,12 @@ function bindEditor() {
   const deleteSoundBtn = document.getElementById('deleteSound');
   const previewSoundBtn = document.getElementById('previewSound');
   const deleteItemBtn = document.getElementById('deleteItem');
+  const recordBtn = document.getElementById('recordSound');
+  const recordingUI = document.getElementById('recordingUI');
+  const soundBtns = document.getElementById('soundBtns');
+  const recStop = document.getElementById('recStop');
+  const recCancel = document.getElementById('recCancel');
+  const recTimer = document.getElementById('recTimer');
 
   if (!imageInput) return;
   const item = state.editingItem;
@@ -1356,6 +1508,42 @@ function bindEditor() {
     await mediaDB.saveSound(mod, item.id, file);
     go('editItem');
   });
+
+  // Record sound button
+  if (recordBtn && recorder.isSupported()) {
+    recordBtn.addEventListener('click', async () => {
+      try {
+        await recorder.start();
+        soundBtns.style.display = 'none';
+        recordingUI.style.display = '';
+        recorder._timerInterval = setInterval(() => {
+          if (recTimer) recTimer.textContent = recorder.formatTime(recorder.getElapsed());
+        }, 500);
+      } catch (e) {
+        alert('Could not access microphone. Please allow microphone access.');
+      }
+    });
+  } else if (recordBtn) {
+    recordBtn.style.display = 'none';
+  }
+
+  if (recStop) {
+    recStop.addEventListener('click', async () => {
+      const blob = await recorder.stop();
+      if (blob && blob.size > 0) {
+        await mediaDB.saveSound(mod, item.id, blob);
+      }
+      go('editItem');
+    });
+  }
+
+  if (recCancel) {
+    recCancel.addEventListener('click', () => {
+      recorder.cancel();
+      soundBtns.style.display = '';
+      recordingUI.style.display = 'none';
+    });
+  }
 
   if (deleteImageBtn) {
     deleteImageBtn.addEventListener('click', async () => {
@@ -1443,6 +1631,51 @@ function bindAddItem() {
       if (soundFile && preview) {
         preview.textContent = `✓ ${soundFile.name}`;
       }
+    });
+  }
+
+  // Record sound for new item
+  const newRecBtn = document.getElementById('newItemRecord');
+  const newRecUI = document.getElementById('newItemRecordingUI');
+  const newRecStop = document.getElementById('newItemRecStop');
+  const newRecCancel = document.getElementById('newItemRecCancel');
+  const newRecTimer = document.getElementById('newItemRecTimer');
+
+  if (newRecBtn && recorder.isSupported()) {
+    newRecBtn.addEventListener('click', async () => {
+      try {
+        await recorder.start();
+        newRecBtn.parentElement.style.display = 'none';
+        if (newRecUI) newRecUI.style.display = '';
+        recorder._timerInterval = setInterval(() => {
+          if (newRecTimer) newRecTimer.textContent = recorder.formatTime(recorder.getElapsed());
+        }, 500);
+      } catch (e) {
+        alert('Could not access microphone. Please allow microphone access.');
+      }
+    });
+  } else if (newRecBtn) {
+    newRecBtn.style.display = 'none';
+  }
+
+  if (newRecStop) {
+    newRecStop.addEventListener('click', async () => {
+      const blob = await recorder.stop();
+      if (blob && blob.size > 0) {
+        soundFile = blob;
+        const preview = document.getElementById('newItemSoundPreview');
+        if (preview) preview.textContent = '✓ Recorded audio';
+      }
+      if (newRecUI) newRecUI.style.display = 'none';
+      if (newRecBtn) newRecBtn.parentElement.style.display = '';
+    });
+  }
+
+  if (newRecCancel) {
+    newRecCancel.addEventListener('click', () => {
+      recorder.cancel();
+      if (newRecUI) newRecUI.style.display = 'none';
+      if (newRecBtn) newRecBtn.parentElement.style.display = '';
     });
   }
 
@@ -1581,16 +1814,20 @@ async function init() {
   await mediaDB.open();
   state.customItems = await mediaDB.getCustomItems();
   state.abcCustomWords = await mediaDB.getAbcWords();
-  await preloadImages();
 
   render();
 
-  // Hide splash screen
+  // Hide splash screen immediately after first render
   const splash = document.getElementById('splash');
   if (splash) {
     splash.classList.add('hide');
     setTimeout(() => splash.remove(), 600);
   }
+
+  // Preload images in background (non-blocking)
+  preloadImages().then(() => {
+    if (Object.keys(state.imageURLs).length > 0) render();
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);

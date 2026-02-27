@@ -926,6 +926,49 @@ a { pointer-events: none; text-decoration: none; color: inherit; }
   font-weight: 800;
 }
 
+/* ========== RECORDING UI ========== */
+.recording-ui {
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(255, 0, 0, 0.08);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 0, 0, 0.3);
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e53935;
+}
+
+.rec-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: #e53935;
+  border-radius: 50%;
+  animation: recPulse 1s ease-in-out infinite;
+}
+
+@keyframes recPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.recording-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.rec-stop {
+  background: #e53935 !important;
+  color: white !important;
+}
+
 /* ========== RESPONSIVE ========== */
 @media (orientation: portrait) {
   .card-row { gap: 16px; }
