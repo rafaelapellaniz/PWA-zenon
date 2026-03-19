@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zenon-learn-v6';
+const CACHE_NAME = 'zenon-learn-v7';
 const APP_SHELL = [
   './',
   './index.html',

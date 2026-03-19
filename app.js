@@ -380,11 +380,18 @@ const sound = {
     }
 
     // 5. Preload voices (iOS loads them asynchronously)
-    if (this.synth && this.synth.getVoices) {
-      this.synth.getVoices();
-      if (typeof this.synth.addEventListener === 'function') {
-        this.synth.addEventListener('voiceschanged', () => this.synth.getVoices());
-      }
+    this._loadVoices();
+
+    // 6. iOS: also warm up Spanish TTS with a silent Spanish utterance
+    if (this.synth) {
+      setTimeout(() => {
+        const es = new SpeechSynthesisUtterance(' ');
+        es.volume = 0.01;
+        es.lang = 'es-ES';
+        const match = this._findVoice('es-ES');
+        if (match) es.voice = match;
+        this.synth.speak(es);
+      }, 100);
     }
   },
 
@@ -396,40 +403,100 @@ const sound = {
     return this._ctx;
   },
 
+  _voices: [],
+  _voicesReady: false,
+
+  _loadVoices() {
+    if (!this.synth) return;
+    const load = () => {
+      this._voices = this.synth.getVoices();
+      if (this._voices.length > 0) this._voicesReady = true;
+    };
+    load();
+    if (typeof this.synth.addEventListener === 'function') {
+      this.synth.addEventListener('voiceschanged', load);
+    }
+  },
+
+  _findVoice(lang) {
+    const voices = this._voices.length ? this._voices : (this.synth ? this.synth.getVoices() : []);
+    const base = lang.split('-')[0];
+    return voices.find(v => v.lang === lang) ||
+           voices.find(v => v.lang.replace('_', '-') === lang) ||
+           voices.find(v => v.lang.startsWith(base + '-')) ||
+           voices.find(v => v.lang.startsWith(base + '_')) ||
+           voices.find(v => v.lang.toLowerCase().startsWith(base));
+  },
+
   speak(text, opts = {}) {
     return new Promise(resolve => {
       if (!this.synth) { resolve(); return; }
-      this.synth.cancel();
+      // Only cancel if something is actually playing
+      if (this.synth.speaking || this.synth.pending) {
+        this.synth.cancel();
+      }
       let resolved = false;
       const done = () => { if (!resolved) { resolved = true; resolve(); } };
 
-      // iOS needs a brief delay after cancel() before speak()
-      setTimeout(() => {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      const doSpeak = () => {
         const u = new SpeechSynthesisUtterance(text);
         u.pitch  = opts.pitch  ?? 1;
         u.rate   = opts.rate   ?? 0.9;
         u.volume = opts.volume ?? 1;
         u.lang   = opts.lang   ?? 'en-US';
 
-        // Select a matching voice if available
-        const voices = this.synth.getVoices();
-        const match = voices.find(v => v.lang === u.lang) ||
-                      voices.find(v => v.lang.startsWith(u.lang.split('-')[0]));
+        const match = this._findVoice(u.lang);
         if (match) u.voice = match;
 
         u.onend   = done;
-        u.onerror = done;
+        u.onerror = () => {
+          // iOS: retry once on error
+          if (isIOS && !resolved) {
+            setTimeout(() => {
+              const retry = new SpeechSynthesisUtterance(text);
+              retry.pitch = u.pitch; retry.rate = u.rate;
+              retry.volume = u.volume; retry.lang = u.lang;
+              if (match) retry.voice = match;
+              retry.onend = done; retry.onerror = done;
+              this.synth.speak(retry);
+            }, 250);
+          } else { done(); }
+        };
         this.synth.speak(u);
 
-        // iOS workaround: periodically resume to prevent iOS from pausing speech
+        // iOS: resume frequently to prevent OS from pausing speech
+        const interval = isIOS ? 200 : 2500;
         const keepAlive = setInterval(() => {
           if (!this.synth.speaking) { clearInterval(keepAlive); return; }
           this.synth.resume();
-        }, 2500);
+        }, interval);
 
         // Safety timeout
         setTimeout(() => { clearInterval(keepAlive); done(); }, 5000);
-      }, 60);
+      };
+
+      // iOS needs a longer delay after cancel; also wait for voices if not loaded
+      const delay = isIOS ? 180 : 60;
+      if (!this._voicesReady && this.synth.getVoices().length === 0) {
+        const fallback = setTimeout(() => doSpeak(), 600);
+        const onReady = () => {
+          this._voices = this.synth.getVoices();
+          this._voicesReady = true;
+          clearTimeout(fallback);
+          setTimeout(doSpeak, delay);
+        };
+        if (typeof this.synth.addEventListener === 'function') {
+          this.synth.addEventListener('voiceschanged', onReady, { once: true });
+        } else {
+          clearTimeout(fallback);
+          setTimeout(doSpeak, delay);
+        }
+      } else {
+        setTimeout(doSpeak, delay);
+      }
     });
   },
 
@@ -509,11 +576,23 @@ const sound = {
 
   async playItem(item, moduleType) {
     this.unlock();
+    if (moduleType === 'abc') {
+      // Start TTS immediately (no async gap) for reliable iOS playback,
+      // then check for custom sound blob in background
+      const ttsPromise = this.speak(item.name, { lang: 'es-ES', rate: 0.85 });
+      const soundBlob = await media.getSoundBlob(moduleType, item.id);
+      if (soundBlob) {
+        // Custom sound exists — cancel TTS and play the blob instead
+        if (this.synth) this.synth.cancel();
+        await this.playBlob(soundBlob);
+      } else {
+        await ttsPromise;
+      }
+      return;
+    }
     const soundBlob = await media.getSoundBlob(moduleType, item.id);
     if (soundBlob) {
       await this.playBlob(soundBlob);
-    } else if (moduleType === 'abc') {
-      await this.speak(item.name, { lang: 'es-ES', rate: 0.85 });
     } else if (moduleType === 'animals') {
       await this.speak(item.sound, { pitch: 1.1, rate: 1 });
       await delay(300);
@@ -525,11 +604,20 @@ const sound = {
 
   async playQuizClue(item, moduleType) {
     this.unlock();
+    if (moduleType === 'abc') {
+      const ttsPromise = this.speak(item.name, { lang: 'es-ES', rate: 0.85 });
+      const soundBlob = await media.getSoundBlob(moduleType, item.id);
+      if (soundBlob) {
+        if (this.synth) this.synth.cancel();
+        this.playBlob(soundBlob);
+      } else {
+        await ttsPromise;
+      }
+      return;
+    }
     const soundBlob = await media.getSoundBlob(moduleType, item.id);
     if (soundBlob) {
       this.playBlob(soundBlob);
-    } else if (moduleType === 'abc') {
-      this.speak(item.name, { lang: 'es-ES', rate: 0.85 });
     } else if (moduleType === 'animals') {
       this.speak(item.sound, { pitch: 1.1, rate: 1 });
     } else {
