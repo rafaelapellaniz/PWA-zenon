@@ -38,55 +38,109 @@ const ABC_LETTERS = [
 ];
 
 const ABC_WORDS = [
-  { id: 'arbol',      name: 'Árbol',      letter: 'a', color: '#43A047' },
-  { id: 'abeja',      name: 'Abeja',      letter: 'a', color: '#FFA000' },
-  { id: 'barco',      name: 'Barco',      letter: 'b', color: '#1E88E5' },
-  { id: 'ballena',    name: 'Ballena',    letter: 'b', color: '#546E7A' },
-  { id: 'casa',       name: 'Casa',       letter: 'c', color: '#FF7043' },
-  { id: 'caballo',    name: 'Caballo',    letter: 'c', color: '#8D6E63' },
-  { id: 'dinosaurio', name: 'Dinosaurio', letter: 'd', color: '#66BB6A' },
-  { id: 'delfin',     name: 'Delfín',     letter: 'd', color: '#29B6F6' },
-  { id: 'estrella',   name: 'Estrella',   letter: 'e', color: '#FFD93D' },
-  { id: 'elefante',   name: 'Elefante',   letter: 'e', color: '#78909C' },
-  { id: 'flor',       name: 'Flor',       letter: 'f', color: '#EC407A' },
-  { id: 'fresa',      name: 'Fresa',      letter: 'f', color: '#E53935' },
-  { id: 'gato',       name: 'Gato',       letter: 'g', color: '#FF9800' },
-  { id: 'globo',      name: 'Globo',      letter: 'g', color: '#AB47BC' },
-  { id: 'helado',     name: 'Helado',     letter: 'h', color: '#F48FB1' },
-  { id: 'hormiga',    name: 'Hormiga',    letter: 'h', color: '#6D4C41' },
-  { id: 'iglesia',    name: 'Iglesia',    letter: 'i', color: '#9E9E9E' },
-  { id: 'iguana',     name: 'Iguana',     letter: 'i', color: '#43A047' },
-  { id: 'jirafa',     name: 'Jirafa',     letter: 'j', color: '#FFA000' },
-  { id: 'jardin',     name: 'Jardín',     letter: 'j', color: '#66BB6A' },
-  { id: 'koala',      name: 'Koala',      letter: 'k', color: '#78909C' },
-  { id: 'kiwi',       name: 'Kiwi',       letter: 'k', color: '#8D6E63' },
-  { id: 'leon',       name: 'León',       letter: 'l', color: '#FFA000' },
-  { id: 'luna',       name: 'Luna',       letter: 'l', color: '#1976D2' },
-  { id: 'mariposa',   name: 'Mariposa',   letter: 'm', color: '#AB47BC' },
-  { id: 'manzana',    name: 'Manzana',    letter: 'm', color: '#E53935' },
-  { id: 'naranja',    name: 'Naranja',    letter: 'n', color: '#FF9800' },
-  { id: 'nube',       name: 'Nube',       letter: 'n', color: '#90CAF9' },
-  { id: 'nandu',      name: 'Ñandú',      letter: 'ñ', color: '#8D6E63' },
-  { id: 'oso',        name: 'Oso',        letter: 'o', color: '#6D4C41' },
-  { id: 'oveja',      name: 'Oveja',      letter: 'o', color: '#9E9E9E' },
-  { id: 'perro',      name: 'Perro',      letter: 'p', color: '#8D6E63' },
-  { id: 'pelota',     name: 'Pelota',     letter: 'p', color: '#E53935' },
-  { id: 'queso',      name: 'Queso',      letter: 'q', color: '#FFC107' },
-  { id: 'raton',      name: 'Ratón',      letter: 'r', color: '#78909C' },
-  { id: 'rosa',       name: 'Rosa',       letter: 'r', color: '#EC407A' },
-  { id: 'sol',        name: 'Sol',        letter: 's', color: '#FFD93D' },
-  { id: 'serpiente',  name: 'Serpiente',   letter: 's', color: '#43A047' },
-  { id: 'tortuga',    name: 'Tortuga',    letter: 't', color: '#66BB6A' },
-  { id: 'tren',       name: 'Tren',       letter: 't', color: '#1E88E5' },
-  { id: 'uva',        name: 'Uva',        letter: 'u', color: '#7B1FA2' },
-  { id: 'unicornio',  name: 'Unicornio',  letter: 'u', color: '#AB47BC' },
-  { id: 'vaca',       name: 'Vaca',       letter: 'v', color: '#9E9E9E' },
-  { id: 'volcan',     name: 'Volcán',     letter: 'v', color: '#FF7043' },
-  { id: 'waffle',     name: 'Waffle',     letter: 'w', color: '#FFA000' },
-  { id: 'xilofono',   name: 'Xilófono',   letter: 'x', color: '#EC407A' },
-  { id: 'yoyo',       name: 'Yoyo',       letter: 'y', color: '#1E88E5' },
-  { id: 'zapato',     name: 'Zapato',     letter: 'z', color: '#6D4C41' },
-  { id: 'zanahoria',  name: 'Zanahoria',  letter: 'z', color: '#FF7043' }
+  // A – 4 animales
+  { id: 'abeja',       name: 'Abeja',       letter: 'a', emoji: '🐝', color: '#FFA000' },
+  { id: 'aguila',      name: 'Águila',      letter: 'a', emoji: '🦅', color: '#8D6E63' },
+  { id: 'arana',       name: 'Araña',       letter: 'a', emoji: '🕷️', color: '#424242' },
+  { id: 'ardilla',     name: 'Ardilla',     letter: 'a', emoji: '🐿️', color: '#FF9800' },
+  // B – 4 animales
+  { id: 'ballena',     name: 'Ballena',     letter: 'b', emoji: '🐋', color: '#1E88E5' },
+  { id: 'buho',        name: 'Búho',        letter: 'b', emoji: '🦉', color: '#8D6E63' },
+  { id: 'bufalo',      name: 'Búfalo',      letter: 'b', emoji: '🦬', color: '#6D4C41' },
+  { id: 'borrego',     name: 'Borrego',     letter: 'b', emoji: '🐑', color: '#9E9E9E' },
+  // C – 4 animales
+  { id: 'caballo',     name: 'Caballo',     letter: 'c', emoji: '🐴', color: '#8D6E63' },
+  { id: 'conejo',      name: 'Conejo',      letter: 'c', emoji: '🐰', color: '#BDBDBD' },
+  { id: 'cerdo',       name: 'Cerdo',       letter: 'c', emoji: '🐷', color: '#F48FB1' },
+  { id: 'cangrejo',    name: 'Cangrejo',    letter: 'c', emoji: '🦀', color: '#E53935' },
+  // D – 4 animales
+  { id: 'delfin',      name: 'Delfín',      letter: 'd', emoji: '🐬', color: '#29B6F6' },
+  { id: 'dinosaurio',  name: 'Dinosaurio',  letter: 'd', emoji: '🦕', color: '#66BB6A' },
+  { id: 'dromedario',  name: 'Dromedario',  letter: 'd', emoji: '🐪', color: '#FFA000' },
+  { id: 'dodo',        name: 'Dodo',        letter: 'd', emoji: '🦤', color: '#78909C' },
+  // E – 4 animales
+  { id: 'elefante',    name: 'Elefante',    letter: 'e', emoji: '🐘', color: '#78909C' },
+  { id: 'erizo',       name: 'Erizo',       letter: 'e', emoji: '🦔', color: '#8D6E63' },
+  { id: 'escarabajo',  name: 'Escarabajo',  letter: 'e', emoji: '🪲', color: '#43A047' },
+  { id: 'escorpion',   name: 'Escorpión',   letter: 'e', emoji: '🦂', color: '#FF7043' },
+  // F – 2 animales
+  { id: 'foca',        name: 'Foca',        letter: 'f', emoji: '🦭', color: '#546E7A' },
+  { id: 'flamenco',    name: 'Flamenco',    letter: 'f', emoji: '🦩', color: '#EC407A' },
+  // G – 4 animales
+  { id: 'gato',        name: 'Gato',        letter: 'g', emoji: '🐱', color: '#FF9800' },
+  { id: 'gorila',      name: 'Gorila',      letter: 'g', emoji: '🦍', color: '#424242' },
+  { id: 'gallina',     name: 'Gallina',     letter: 'g', emoji: '🐔', color: '#FFA000' },
+  { id: 'gusano',      name: 'Gusano',      letter: 'g', emoji: '🪱', color: '#8D6E63' },
+  // H – 2 animales
+  { id: 'hormiga',     name: 'Hormiga',     letter: 'h', emoji: '🐜', color: '#6D4C41' },
+  { id: 'hipopotamo',  name: 'Hipopótamo',  letter: 'h', emoji: '🦛', color: '#78909C' },
+  // I – 2 animales
+  { id: 'iguana',      name: 'Iguana',      letter: 'i', emoji: '🦎', color: '#43A047' },
+  { id: 'insecto',     name: 'Insecto',     letter: 'i', emoji: '🐛', color: '#66BB6A' },
+  // J – 2 animales
+  { id: 'jirafa',      name: 'Jirafa',      letter: 'j', emoji: '🦒', color: '#FFA000' },
+  { id: 'jaguar',      name: 'Jaguar',      letter: 'j', emoji: '🐆', color: '#FF9800' },
+  // K – 2
+  { id: 'koala',       name: 'Koala',       letter: 'k', emoji: '🐨', color: '#78909C' },
+  { id: 'kiwi',        name: 'Kiwi',        letter: 'k', emoji: '🥝', color: '#66BB6A' },
+  // L – 4 animales
+  { id: 'leon',        name: 'León',        letter: 'l', emoji: '🦁', color: '#FFA000' },
+  { id: 'llama',       name: 'Llama',       letter: 'l', emoji: '🦙', color: '#8D6E63' },
+  { id: 'lobo',        name: 'Lobo',        letter: 'l', emoji: '🐺', color: '#546E7A' },
+  { id: 'langosta',    name: 'Langosta',    letter: 'l', emoji: '🦞', color: '#E53935' },
+  // M – 4 animales
+  { id: 'mariposa',    name: 'Mariposa',    letter: 'm', emoji: '🦋', color: '#AB47BC' },
+  { id: 'mono',        name: 'Mono',        letter: 'm', emoji: '🐵', color: '#8D6E63' },
+  { id: 'murcielago',  name: 'Murciélago',  letter: 'm', emoji: '🦇', color: '#424242' },
+  { id: 'mapache',     name: 'Mapache',     letter: 'm', emoji: '🦝', color: '#78909C' },
+  // N – 2
+  { id: 'nutria',      name: 'Nutria',      letter: 'n', emoji: '🦦', color: '#8D6E63' },
+  { id: 'naranja',     name: 'Naranja',     letter: 'n', emoji: '🍊', color: '#FF9800' },
+  // Ñ – 2 animales
+  { id: 'nandu',       name: 'Ñandú',       letter: 'ñ', emoji: '🐦', color: '#8D6E63' },
+  { id: 'nu',          name: 'Ñu',          letter: 'ñ', emoji: '🐃', color: '#6D4C41' },
+  // O – 4 animales
+  { id: 'oso',         name: 'Oso',         letter: 'o', emoji: '🐻', color: '#6D4C41' },
+  { id: 'oveja',       name: 'Oveja',       letter: 'o', emoji: '🐑', color: '#BDBDBD' },
+  { id: 'orangutan',   name: 'Orangután',   letter: 'o', emoji: '🦧', color: '#FF7043' },
+  { id: 'oruga',       name: 'Oruga',       letter: 'o', emoji: '🐛', color: '#66BB6A' },
+  // P – 4 animales
+  { id: 'perro',       name: 'Perro',       letter: 'p', emoji: '🐶', color: '#8D6E63' },
+  { id: 'pinguino',    name: 'Pingüino',    letter: 'p', emoji: '🐧', color: '#424242' },
+  { id: 'pulpo',       name: 'Pulpo',       letter: 'p', emoji: '🐙', color: '#AB47BC' },
+  { id: 'pato',        name: 'Pato',        letter: 'p', emoji: '🦆', color: '#66BB6A' },
+  // Q – 2
+  { id: 'quetzal',     name: 'Quetzal',     letter: 'q', emoji: '🦜', color: '#43A047' },
+  { id: 'queso',       name: 'Queso',       letter: 'q', emoji: '🧀', color: '#FFC107' },
+  // R – 4 animales
+  { id: 'raton',       name: 'Ratón',       letter: 'r', emoji: '🐭', color: '#78909C' },
+  { id: 'rana',        name: 'Rana',        letter: 'r', emoji: '🐸', color: '#43A047' },
+  { id: 'rinoceronte', name: 'Rinoceronte', letter: 'r', emoji: '🦏', color: '#9E9E9E' },
+  { id: 'reno',        name: 'Reno',        letter: 'r', emoji: '🦌', color: '#8D6E63' },
+  // S – 2 animales
+  { id: 'serpiente',   name: 'Serpiente',   letter: 's', emoji: '🐍', color: '#43A047' },
+  { id: 'salmon',      name: 'Salmón',      letter: 's', emoji: '🐟', color: '#29B6F6' },
+  // T – 4 animales
+  { id: 'tortuga',     name: 'Tortuga',     letter: 't', emoji: '🐢', color: '#66BB6A' },
+  { id: 'tigre',       name: 'Tigre',       letter: 't', emoji: '🐯', color: '#FF9800' },
+  { id: 'tiburon',     name: 'Tiburón',     letter: 't', emoji: '🦈', color: '#546E7A' },
+  { id: 'toro',        name: 'Toro',        letter: 't', emoji: '🐂', color: '#6D4C41' },
+  // U – 2
+  { id: 'unicornio',   name: 'Unicornio',   letter: 'u', emoji: '🦄', color: '#AB47BC' },
+  { id: 'uva',         name: 'Uva',         letter: 'u', emoji: '🍇', color: '#7B1FA2' },
+  // V – 2 animales
+  { id: 'vaca',        name: 'Vaca',        letter: 'v', emoji: '🐮', color: '#9E9E9E' },
+  { id: 'venado',      name: 'Venado',      letter: 'v', emoji: '🦌', color: '#8D6E63' },
+  // W – 1
+  { id: 'waffle',      name: 'Waffle',      letter: 'w', emoji: '🧇', color: '#FFA000' },
+  // X – 1
+  { id: 'xilofono',    name: 'Xilófono',    letter: 'x', emoji: '🎵', color: '#EC407A' },
+  // Y – 2
+  { id: 'yoyo',        name: 'Yoyo',        letter: 'y', emoji: '🪀', color: '#1E88E5' },
+  { id: 'yegua',       name: 'Yegua',       letter: 'y', emoji: '🐴', color: '#8D6E63' },
+  // Z – 2
+  { id: 'zorro',       name: 'Zorro',       letter: 'z', emoji: '🦊', color: '#FF7043' },
+  { id: 'zanahoria',   name: 'Zanahoria',   letter: 'z', emoji: '🥕', color: '#FF9800' }
 ];
 
 const COLOR_PALETTE = [
@@ -830,7 +884,8 @@ function renderAbcExplore() {
            style="background:linear-gradient(135deg,${w.color}dd,${w.color}99)">
         ${imgURL
           ? `<img class="abc-word-img" src="${imgURL}" alt="${w.name}" draggable="false">`
-          : `<div class="abc-word-placeholder">?</div>`}
+          : `<div class="abc-word-emoji">${w.emoji || '?'}</div>`}
+        <div class="abc-word-name">${w.name}</div>
       </div>`;
   }).join('');
 
@@ -949,7 +1004,7 @@ function renderAbcLetterWords() {
         <div class="settings-item-visual" style="background:linear-gradient(135deg,${w.color}dd,${w.color}99)">
           ${hasImg
             ? `<img class="settings-item-img" src="${state.imageURLs[key]}" alt="${w.name}" draggable="false">`
-            : `<span class="settings-item-emoji">?</span>`}
+            : `<span class="settings-item-emoji">${w.emoji || '?'}</span>`}
         </div>
         <div class="settings-item-info">
           <div class="settings-item-name">${w.name}${isCustom ? ' <span class="custom-badge">custom</span>' : ''}</div>
