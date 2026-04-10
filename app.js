@@ -336,7 +336,8 @@ const state = {
   customItems: [],
   // ABC module
   abcLetterIndex: 0,
-  abcCustomWords: []
+  abcCustomWords: [],
+  abcBusy: false
 };
 
 // ──────────────── SOUND MANAGER ────────────────
@@ -609,7 +610,7 @@ const sound = {
       const soundBlob = await media.getSoundBlob(moduleType, item.id);
       if (soundBlob) {
         if (this.synth) this.synth.cancel();
-        this.playBlob(soundBlob);
+        await this.playBlob(soundBlob);
       } else {
         await ttsPromise;
       }
@@ -997,10 +998,18 @@ function renderAbcExplore() {
 
 function renderAbcQuiz() {
   const num = `${state.quizIndex + 1} / ${state.quizItems.length}`;
-  const opts = state.quizOptions.map(letter => `
-    <div class="abc-quiz-option" data-letter="${letter}">
-      ${getAbcLetterLabel(letter)}
-    </div>`).join('');
+  const opts = state.quizOptions.map(w => {
+    const key = `abc/${w.id}`;
+    const imgURL = state.imageURLs[key];
+    return `
+    <div class="abc-quiz-option" data-word-id="${w.id}"
+         style="background:linear-gradient(135deg,${w.color}dd,${w.color}99)">
+      ${imgURL
+        ? `<img class="abc-quiz-option-img" src="${imgURL}" alt="${w.name}" draggable="false">`
+        : `<div class="abc-quiz-option-emoji">${w.emoji || '?'}</div>`}
+      <div class="abc-quiz-option-name">${w.name}</div>
+    </div>`;
+  }).join('');
 
   return `
     <div class="header">
@@ -1010,7 +1019,7 @@ function renderAbcQuiz() {
     </div>
     <div class="content">
       <div class="quiz-wrap">
-        <div class="quiz-prompt">¿Con qué letra empieza?</div>
+        <div class="quiz-prompt">¿Cuál es?</div>
         <button class="play-btn" id="playBtn">🔊</button>
         <div class="abc-quiz-options">${opts}</div>
       </div>
@@ -1028,29 +1037,29 @@ function startAbcQuiz() {
 
 function prepareAbcQuestion() {
   const word = state.quizItems[state.quizIndex];
-  const correctLetter = word.letter;
-  const otherLetters = ABC_LETTERS.filter(l => l !== correctLetter);
-  const wrongLetters = shuffle(otherLetters).slice(0, 3);
-  state.quizOptions = shuffle([correctLetter, ...wrongLetters]);
+  const allWords = getAbcWords();
+  const otherWords = allWords.filter(w => w.id !== word.id);
+  const wrongWords = shuffle(otherWords).slice(0, 3);
+  state.quizOptions = shuffle([word, ...wrongWords]);
   state.quizCorrect = word;
   state.quizLocked = false;
 }
 
-function handleAbcQuizAnswer(letter) {
+function handleAbcQuizAnswer(wordId) {
   if (state.quizLocked) return;
   state.quizLocked = true;
 
   const correct = state.quizCorrect;
-  const isRight = letter === correct.letter;
+  const isRight = wordId === correct.id;
 
   if (isRight) state.quizScore++;
 
   document.querySelectorAll('.abc-quiz-option').forEach(el => {
     el.classList.add('disabled');
-    if (el.dataset.letter === letter) {
+    if (el.dataset.wordId === wordId) {
       el.classList.add(isRight ? 'correct' : 'wrong');
     }
-    if (el.dataset.letter === correct.letter && !isRight) {
+    if (el.dataset.wordId === correct.id && !isRight) {
       el.classList.add('reveal');
     }
   });
@@ -1481,12 +1490,15 @@ function bind() {
     el.addEventListener('click', () => handleQuizAnswer(el.dataset.id));
   });
 
-  // Replay quiz sound button
+  // Replay quiz sound button (with rage-click prevention for ABC)
   const playBtn = document.getElementById('playBtn');
   if (playBtn) {
-    playBtn.addEventListener('click', () => {
+    playBtn.addEventListener('click', async () => {
       if (state.screen === 'abcQuiz') {
-        sound.playQuizClue(state.quizCorrect, 'abc');
+        if (state.abcBusy) return;
+        state.abcBusy = true;
+        await sound.playQuizClue(state.quizCorrect, 'abc');
+        state.abcBusy = false;
       } else {
         sound.playQuizClue(state.quizCorrect, state.module);
       }
@@ -1545,25 +1557,29 @@ function bind() {
     });
   }
 
-  // ABC Explore — word card tap (speak word)
+  // ABC Explore — word card tap (speak word, with rage-click prevention)
   document.querySelectorAll('.abc-word-card').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', async () => {
+      if (state.abcBusy) return;
+      state.abcBusy = true;
+
       const wordId = el.dataset.wordId;
       const allWords = getAbcWords();
       const word = allWords.find(w => w.id === wordId);
-      if (!word) return;
+      if (!word) { state.abcBusy = false; return; }
 
       el.classList.remove('playing');
       void el.offsetWidth;
       el.classList.add('playing');
 
-      sound.playItem(word, 'abc');
+      await sound.playItem(word, 'abc');
+      state.abcBusy = false;
     });
   });
 
-  // ABC Quiz — letter option tap
+  // ABC Quiz — option tap
   document.querySelectorAll('.abc-quiz-option').forEach(el => {
-    el.addEventListener('click', () => handleAbcQuizAnswer(el.dataset.letter));
+    el.addEventListener('click', () => handleAbcQuizAnswer(el.dataset.wordId));
   });
 
   // ABC Letter Words settings — word item click (edit word image)
